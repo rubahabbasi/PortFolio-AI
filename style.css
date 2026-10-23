@@ -1,0 +1,119 @@
+/* ==========================================================================
+   MUHAMMAD RUBAH ABBASI // 3D ARCHITECT & AI DEVELOPER PORTFOLIO STYLES
+   ========================================================================== */
+
+:root {
+  --bg-void: #070709;
+  --glass-surface: rgba(15, 18, 26, 0.72);
+  --amber-arch: #F59E0B;
+  --cyan-ai: #00F0FF;
+  --border-subtle: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-void);
+}
+
+/* Glassmorphism Surface */
+.glass-panel {
+  background: var(--glass-surface);
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid var(--border-subtle);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease, transform 0.3s ease;
+}
+
+/* Background Video Layers Smooth Crossfade & Parallax Slide */
+.bg-video-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform: scale(1.06) translateY(24px);
+  transition: opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.bg-video-layer.active {
+  opacity: 1;
+  transform: scale(1) translateY(0px);
+}
+
+.bg-video-layer video,
+.bg-video-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.68) contrast(1.08) saturate(1.05);
+}
+
+/* Blueprint / X-Ray Global Mode */
+body.blueprint-mode .blueprint-overlay {
+  opacity: 1 !important;
+}
+
+body.blueprint-mode .bg-video-layer video,
+body.blueprint-mode .stage-media-element {
+  filter: contrast(1.22) saturate(0.25) hue-rotate(155deg) brightness(0.8);
+}
+
+body.blueprint-mode .glass-panel {
+  border-color: rgba(0, 240, 255, 0.32);
+  box-shadow: 0 0 32px rgba(0, 240, 255, 0.08);
+}
+
+/* Blueprint Grid Overlay */
+.blueprint-overlay {
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.12) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Unified Project Media Stage Fade Transition (No Bottom Scrollbar) */
+.project-stage-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.02);
+  transition: opacity 0.55s ease, transform 0.65s ease;
+}
+
+.project-stage-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(7, 7, 9, 0.8);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(245, 158, 11, 0.45);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00F0FF;
+}
+
+/* Hide custom cursor on touch devices */
+@media (pointer: coarse) {
+  #cursor-dot,
+  #cursor-ring {
+    display: none !important;
+  }
+}

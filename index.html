@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Muhammad Rubah Abbasi // 3D Architect & AI Full-Stack Developer</title>
+
+  <!-- Google Fonts: Space Grotesk, Syne & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            void: '#070709',
+            glass: 'rgba(15, 18, 26, 0.72)',
+            amberArch: '#F59E0B',
+            cyanAI: '#00F0FF',
+            textPrimary: '#F8FAFC',
+            textMuted: '#94A3B8'
+          },
+          fontFamily: {
+            display: ['Space Grotesk', 'Syne', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg-void text-textPrimary font-display antialiased selection:bg-cyanAI/30 selection:text-cyanAI overflow-x-hidden">
+
+  <!-- ================= CUSTOM MAGNETIC CURSOR ================= -->
+  <div id="cursor-dot" class="fixed top-0 left-0 w-2 h-2 bg-cyanAI rounded-full pointer-events-none z-[9999] -translate-x-1/2 -translate-y-1/2 transition-transform duration-75"></div>
+  <div id="cursor-ring" class="fixed top-0 left-0 w-10 h-10 border border-amberArch/70 rounded-full pointer-events-none z-[9998] -translate-x-1/2 -translate-y-1/2 transition-all duration-200 flex items-center justify-center">
+    <span id="cursor-label" class="text-[8px] font-mono tracking-widest uppercase text-cyanAI opacity-0 transition-opacity">VIEW</span>
+  </div>
+
+  <!-- ================= 1. 5-SECOND GRAND WELCOME SCREEN ================= -->
+  <div id="preloader" class="fixed inset-0 z-[1000] bg-void flex flex-col items-center justify-center px-6 transition-opacity duration-700">
+    <div class="relative w-52 h-52 flex items-center justify-center mb-6">
+      <svg class="w-full h-full" viewBox="0 0 200 200" fill="none">
+        <circle cx="100" cy="100" r="88" stroke="rgba(0, 240, 255, 0.15)" stroke-width="1" stroke-dasharray="4 4" />
+        <circle id="preloader-circle" cx="100" cy="100" r="75" stroke="#00F0FF" stroke-width="2" stroke-dasharray="472" stroke-dashoffset="472" />
+        <polygon id="preloader-poly" points="100,32 162,68 162,132 100,168 38,132 38,68" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="400" stroke-dashoffset="400" fill="rgba(245, 158, 11, 0.04)" />
+      </svg>
+      <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+        <span id="preloader-percent" class="font-mono text-3xl sm:text-4xl font-bold tracking-tighter text-textPrimary">00%</span>
+        <span id="preloader-countdown" class="font-mono text-[11px] tracking-[0.2em] text-amberArch mt-1">5.0s</span>
+      </div>
+    </div>
+
+    <div class="text-center max-w-2xl space-y-3 mb-8">
+      <span class="inline-block font-mono text-xs uppercase tracking-[0.3em] text-cyanAI px-3 py-1 rounded-full bg-cyanAI/10 border border-cyanAI/30">
+        // INITIALIZING 3D ARCHITECTURAL &amp; AI PORTFOLIO
+      </span>
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white">
+        WELCOME TO <span class="text-transparent bg-clip-text bg-gradient-to-r from-amberArch via-amber-200 to-cyanAI">MUHAMMAD RUBAH ABBASI</span> PORTFOLIO
+      </h1>
+      <p class="font-mono text-xs text-textMuted">
+        UNREAL ENGINE 5 • BLENDER 3D • AI-DRIVEN ARCHITECTURE &amp; FULL-STACK WEB DEVELOPMENT
+      </p>
+    </div>
+
+    <div class="w-full max-w-md space-y-2">
+      <div class="flex justify-between font-mono text-xs text-textMuted">
+        <span id="preloader-status">// LOADING SPATIAL ENGINE &amp; 3D REELS</span>
+        <button type="button" id="skip-welcome-btn" class="text-cyanAI hover:underline">SKIP INTRO →</button>
+      </div>
+      <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+        <div id="preloader-bar" class="h-full bg-gradient-to-r from-amberArch via-cyanAI to-amberArch w-0"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= SCROLL-SYNCED MULTI-VIDEO BACKGROUND ENGINE ================= -->
+  <div id="bg-video-stage" class="fixed inset-0 w-full h-full z-0 overflow-hidden pointer-events-none bg-void">
+    <div id="bg-video-layers" class="relative w-full h-full"></div>
+    <canvas id="ambient-dust-canvas" class="absolute inset-0 w-full h-full opacity-50"></canvas>
+    <div class="absolute inset-0 bg-gradient-to-b from-void/70 via-void/45 to-void/85"></div>
+    <div class="blueprint-overlay absolute inset-0 opacity-0 transition-opacity duration-500"></div>
+  </div>
+
+  <!-- Celebratory Particle Burst Canvas -->
+  <canvas id="burst-canvas" class="fixed inset-0 w-full h-full pointer-events-none z-[900]"></canvas>
+
+  <!-- ================= SECRET OWNER FLOATING ADMIN BAR (HIDDEN FOR VISITORS) ================= -->
+  <div id="dev-admin-bar" class="dev-only hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-[120] glass-panel px-4 py-2.5 rounded-2xl border-2 border-emerald-400/70 shadow-2xl flex-wrap items-center gap-2.5">
+    <div class="flex items-center gap-2 pr-2 border-r border-white/15 font-mono text-xs text-emerald-400">
+      <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+      <span>OWNER_UNLOCKED</span>
+    </div>
+
+    <button type="button" id="open-bg-manager-btn" class="px-3.5 py-1.5 rounded-xl bg-amberArch text-black font-mono font-bold text-xs flex items-center gap-1.5 hover:brightness-110 transition-all">
+      <i data-lucide="video" class="w-3.5 h-3.5"></i>
+      <span>🎬 Upload Background Videos</span>
+    </button>
+
+    <button type="button" id="open-cms-btn" class="px-3.5 py-1.5 rounded-xl bg-cyanAI text-black font-mono font-bold text-xs flex items-center gap-1.5 hover:brightness-110 transition-all">
+      <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i>
+      <span>+ Add New Project</span>
+    </button>
+
+    <button type="button" id="open-cv-editor-btn" class="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-mono text-xs flex items-center gap-1.5 transition-all">
+      <i data-lucide="user-pen" class="w-3.5 h-3.5 text-cyanAI"></i>
+      <span>Edit CV &amp; Photo</span>
+    </button>
+
+    <button type="button" id="lock-dev-mode-btn" class="px-3 py-1.5 rounded-xl bg-red-500/20 hover:bg-red-500/30 border border-red-400/40 text-red-300 font-mono text-xs flex items-center gap-1 transition-all">
+      <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+      <span>Lock (Visitor View)</span>
+    </button>
+  </div>
+
+  <!-- ================= ARCHITECTURAL HUD OVERLAY ================= -->
+  <div class="fixed inset-0 pointer-events-none z-30 p-4 md:p-6 flex flex-col justify-between font-mono text-[11px] tracking-wider select-none">
+    <div class="flex justify-between items-start">
+      <div class="glass-panel px-3.5 py-2 rounded-xl border border-white/10 space-y-0.5 hidden sm:block">
+        <div class="flex items-center gap-2 text-amberArch">
+          <span class="w-2 h-2 rounded-full bg-amberArch animate-pulse"></span>
+          <span id="hud-active-reel">BG_REEL_01 // LUXURY VILLA EXTERIOR</span>
+        </div>
+        <div class="text-textMuted text-[10px]">ARCHITECT: MUHAMMAD RUBAH ABBASI // AUDIO: MUTED</div>
+      </div>
+
+      <div class="glass-panel px-3 py-2 rounded-xl border border-white/10 text-right hidden sm:flex items-center gap-3 pointer-events-auto">
+        <span class="text-cyanAI text-[10px]">BG_STAGE:</span>
+        <div id="bg-reel-dots" class="flex items-center gap-1.5"></div>
+      </div>
+    </div>
+
+    <div class="flex justify-between items-end">
+      <div class="glass-panel px-3 py-2 rounded-xl border border-white/10 space-y-0.5 hidden md:block">
+        <div class="text-emerald-400 flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>UNREAL ENGINE 5 • BLENDER • AI ARCHITECTURAL DESIGN</span>
+        </div>
+        <div class="text-textMuted text-[10px]">5-SECOND AUTO VIDEO-TO-IMAGE ENGINE</div>
+      </div>
+
+      <div class="glass-panel px-3 py-2 rounded-xl border border-white/10 text-right hidden md:block">
+        <div class="text-cyanAI" id="hud-scroll-depth">SCROLL_DEPTH: 00%</div>
+        <div class="text-textMuted text-[10px]" id="hud-mode-readout">MODE: PHOTOREAL_RENDER</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FLOATING GLASS DOCK NAVBAR ================= -->
+  <header class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-6xl">
+    <nav class="glass-panel rounded-2xl px-4 py-3 border border-white/10 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+      <!-- Brand Logo (Triple-click or Shift+A to unlock Owner Mode) -->
+      <div id="brand-logo-trigger" class="flex items-center gap-3 group cursor-pointer select-none" data-cursor="HOME" title="Triple-click or press Shift+A to Unlock Owner Mode">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amberArch/20 to-cyanAI/20 border border-white/15 flex items-center justify-center">
+          <i data-lucide="layers" class="w-5 h-5 text-amberArch group-hover:text-cyanAI transition-colors"></i>
+        </div>
+        <div>
+          <span class="font-bold tracking-tight text-sm md:text-base block leading-none">RUBAH<span class="text-cyanAI">.ABBASI</span></span>
+          <span class="font-mono text-[9px] text-textMuted tracking-widest block mt-0.5">3D_ARCHITECT × AI_WEB_DEV</span>
+        </div>
+      </div>
+
+      <div class="hidden lg:flex items-center gap-6 text-xs font-mono tracking-wider text-textMuted">
+        <a href="#hero" class="hover:text-textPrimary transition-colors">01.HOME</a>
+        <a href="#portfolio-pages" class="hover:text-textPrimary transition-colors">02.PROJECTS</a>
+        <a href="#cv-section" class="hover:text-textPrimary transition-colors">03.RESUME_CV</a>
+        <a href="#matrix" class="hover:text-textPrimary transition-colors">04.EXPERTISE</a>
+        <a href="#contact" class="hover:text-textPrimary transition-colors">05.CONTACT</a>
+      </div>
+
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="nav-mode-toggle" type="button" class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-amberArch/40 bg-amberArch/10 text-xs font-mono transition-all" data-cursor="X-RAY">
+          <span id="mode-indicator-dot" class="w-2 h-2 rounded-full bg-amberArch"></span>
+          <span id="mode-toggle-text" class="hidden sm:inline text-amberArch font-medium">RENDER MODE</span>
+        </button>
+
+        <button id="open-ai-btn" type="button" class="px-3 py-1.5 rounded-xl border border-white/10 hover:border-cyanAI/50 bg-white/5 hover:bg-cyanAI/10 text-xs font-mono flex items-center gap-2 transition-all" data-cursor="AI_CLI">
+          <i data-lucide="terminal" class="w-3.5 h-3.5 text-cyanAI"></i>
+          <span class="hidden md:inline">AI Guide</span>
+          <kbd class="px-1.5 py-0.5 text-[10px] bg-black/50 text-cyanAI rounded border border-cyanAI/30">⌘K</kbd>
+        </button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="relative z-10">
+
+    <!-- ================= SECTION 1: HERO STAGE ================= -->
+    <section id="hero" data-bg-index="0" class="relative min-h-screen flex flex-col justify-center pt-28 pb-16 px-4 sm:px-8 max-w-7xl mx-auto">
+      <div class="max-w-4xl space-y-6">
+        <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full glass-panel border border-amberArch/40 text-xs font-mono text-amberArch">
+          <span class="w-2 h-2 rounded-full bg-amberArch animate-ping"></span>
+          <span>MUHAMMAD RUBAH ABBASI // 3D ARCHITECT &amp; AI WEB DEVELOPER</span>
+        </div>
+
+        <h1 class="text-4xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.04]">
+          DESIGNING <span class="text-transparent bg-clip-text bg-gradient-to-r from-amberArch via-amber-200 to-white">UNREAL 3D WORLDS</span>
+          &amp; AI-POWERED
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyanAI via-sky-300 to-indigo-400">DIGITAL WEBSITES.</span>
+        </h1>
+
+        <p class="text-textPrimary/90 text-base sm:text-xl max-w-2xl leading-relaxed font-normal">
+          Welcome to the official portfolio of <strong>Muhammad Rubah Khalid Abbasi</strong>. Combining 3D Architectural Visualization in <strong>Unreal Engine 5 &amp; Blender</strong> with advanced <strong>Paid AI Toolchains</strong> and Full-Stack Web Engineering.
+        </p>
+
+        <!-- Background Video Stage Selector -->
+        <div class="glass-panel p-4 rounded-2xl border border-white/15 max-w-2xl space-y-3">
+          <div class="flex items-center justify-between font-mono text-xs">
+            <span class="text-cyanAI flex items-center gap-2">
+              <i data-lucide="film" class="w-4 h-4"></i>
+              <span>LIVE 3D BACKGROUND REELS (SCROLL DOWN FOR SMOOTH TRANSITION)</span>
+            </span>
+            <button type="button" id="hero-dev-upload-bg-btn" class="dev-only hidden text-amberArch underline font-mono text-[11px]">
+              + Upload BG Videos
+            </button>
+          </div>
+          <div id="hero-reel-buttons" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-4 pt-2">
+          <a href="#portfolio-pages" class="px-7 py-4 rounded-xl bg-gradient-to-r from-amberArch to-amber-500 text-black font-mono font-bold text-xs sm:text-sm tracking-wider uppercase flex items-center gap-2 hover:shadow-xl hover:shadow-amberArch/30 transition-all" data-cursor="PROJECTS">
+            <span>Explore 3D &amp; AI Projects</span>
+            <i data-lucide="arrow-down" class="w-4 h-4"></i>
+          </a>
+          <a href="#cv-section" class="px-7 py-4 rounded-xl glass-panel border border-cyanAI/40 hover:border-cyanAI text-cyanAI font-mono text-xs sm:text-sm tracking-wider uppercase flex items-center gap-2 transition-all" data-cursor="CV">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+            <span>View Official CV</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 2: LARGE-SCALE PAGE-WISE PORTFOLIO ================= -->
+    <section id="portfolio-pages" data-bg-index="1" class="py-24 px-4 sm:px-8 max-w-[1380px] mx-auto space-y-12">
+      
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
+        <div>
+          <div class="font-mono text-xs text-cyanAI tracking-widest uppercase mb-2">// 02. LARGE-SCALE PROJECT EXHIBITION</div>
+          <h2 class="text-3xl sm:text-5xl font-bold tracking-tight">
+            Featured Projects <span id="project-count-badge" class="font-mono text-lg text-amberArch align-top">(04)</span>
+          </h2>
+          <p class="text-textMuted text-sm mt-2 max-w-2xl">
+            Each project plays its <strong>3D Video Reel for 5 seconds</strong> and automatically transitions to its <strong>High-Resolution Pictures</strong>. Use the compact <strong>Arrow Button</strong> at the top-right of the video to switch slides anytime.
+          </p>
+        </div>
+
+        <!-- Owner-Only Controls -->
+        <div class="dev-only hidden flex-wrap items-center gap-2.5">
+          <button type="button" id="showcase-bg-btn" class="px-4 py-2.5 rounded-xl bg-cyanAI text-black font-mono font-bold text-xs flex items-center gap-1.5">
+            <i data-lucide="video" class="w-4 h-4"></i>
+            <span>Upload BG Videos</span>
+          </button>
+          <button type="button" id="showcase-add-btn" class="px-4 py-2.5 rounded-xl bg-amberArch text-black font-mono font-bold text-xs flex items-center gap-1.5">
+            <i data-lucide="plus-circle" class="w-4 h-4"></i>
+            <span>+ Add New Project</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Category Tabs & Search -->
+      <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <div id="category-filters" class="flex flex-wrap items-center gap-2">
+          <button type="button" data-category="All" class="filter-btn active px-4 py-2.5 rounded-xl font-mono text-xs border border-amberArch bg-amberArch/20 text-amberArch transition-all">
+            All Projects
+          </button>
+          <button type="button" data-category="Blender & Unreal 3D" class="filter-btn px-4 py-2.5 rounded-xl font-mono text-xs border border-white/10 glass-panel text-textMuted hover:text-white transition-all">
+            Blender &amp; Unreal 3D
+          </button>
+          <button type="button" data-category="Interior & Exterior Arch" class="filter-btn px-4 py-2.5 rounded-xl font-mono text-xs border border-white/10 glass-panel text-textMuted hover:text-white transition-all">
+            Interior &amp; Exterior Arch
+          </button>
+          <button type="button" data-category="Full-Stack Websites" class="filter-btn px-4 py-2.5 rounded-xl font-mono text-xs border border-white/10 glass-panel text-textMuted hover:text-white transition-all">
+            AI &amp; Full-Stack Websites
+          </button>
+        </div>
+
+        <div class="relative min-w-[270px]">
+          <i data-lucide="search" class="w-4 h-4 text-textMuted absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input
+            id="project-search"
+            type="text"
+            placeholder="Search Unreal Engine, Blender, AI Web..."
+            class="w-full pl-10 pr-4 py-2.5 rounded-xl glass-panel border border-white/10 focus:border-cyanAI focus:outline-none font-mono text-xs text-white placeholder:text-textMuted"
+          />
+        </div>
+      </div>
+
+      <div id="project-page-jumper" class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs"></div>
+
+      <!-- LARGE-SCALE PAGE-WISE PROJECTS CONTAINER -->
+      <div id="large-projects-List" class="space-y-20"></div>
+    </section>
+
+    <!-- ================= SECTION 3: MUHAMMAD RUBAH ABBASI OFFICIAL CV & RESUME ================= -->
+    <section id="cv-section" data-bg-index="2" class="py-24 px-4 sm:px-8 max-w-7xl mx-auto space-y-12">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
+        <div>
+          <div class="font-mono text-xs text-amberArch tracking-widest uppercase mb-2">// 03. CURRICULUM VITAE &amp; VERIFIED DOSSIER</div>
+          <h2 class="text-3xl sm:text-5xl font-bold tracking-tight">Muhammad Rubah Khalid Abbasi</h2>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" id="section-cv-edit-btn" class="dev-only hidden px-4 py-2.5 rounded-xl glass-panel border border-cyanAI/40 hover:border-cyanAI text-cyanAI font-mono text-xs items-center gap-2 transition-all">
+            <i data-lucide="edit-3" class="w-4 h-4"></i>
+            <span>Edit CV Details &amp; Photo (Owner)</span>
+          </button>
+          <button type="button" onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-amberArch text-black font-mono font-bold text-xs flex items-center gap-2 hover:brightness-110 transition-all">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Download / Print CV</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Profile Photo & Personal Identity -->
+        <div class="lg:col-span-4 glass-panel rounded-3xl p-6 sm:p-8 border border-white/15 space-y-6 relative overflow-hidden">
+          <div class="absolute -top-16 -left-16 w-40 h-40 bg-amberArch/15 rounded-full blur-3xl pointer-events-none"></div>
+
+          <!-- Profile Picture Slot -->
+          <div class="relative group mx-auto w-52 h-64 sm:w-60 sm:h-72 rounded-2xl overflow-hidden border-2 border-amberArch/60 shadow-2xl bg-black/60">
+            <img
+              id="cv-profile-img"
+              src=""
+              alt="Muhammad Rubah Khalid Abbasi"
+              class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+            />
+            <label class="dev-only hidden absolute inset-0 bg-black/80 opacity-0 group-hover:opacity-100 transition-opacity flex-col items-center justify-center cursor-pointer font-mono text-xs text-cyanAI p-4 text-center">
+              <i data-lucide="camera" class="w-7 h-7 mb-2 text-amberArch"></i>
+              <span>Click to Upload Your Profile Photo</span>
+              <input type="file" id="quick-profile-photo-input" accept="image/*" class="hidden" />
+            </label>
+          </div>
+
+          <div class="text-center space-y-1.5">
+            <span id="cv-badge" class="inline-block font-mono text-[10px] tracking-widest uppercase px-3 py-1 rounded-full bg-cyanAI/15 text-cyanAI border border-cyanAI/30">
+              FWO SPECIALIST • 3D &amp; AI DEVELOPER
+            </span>
+            <h3 id="cv-name" class="text-2xl font-bold text-white">Muhammad Rubah Khalid Abbasi</h3>
+            <p id="cv-role" class="font-mono text-xs text-amberArch">3D Unreal Engine Architect &amp; AI Full-Stack Web Developer</p>
+          </div>
+
+          <p id="cv-bio" class="text-textMuted text-xs sm:text-sm leading-relaxed text-center"></p>
+
+          <!-- Personal Verification Fields -->
+          <div class="border-t border-white/10 pt-4 space-y-2.5 font-mono text-xs">
+            <div class="flex justify-between gap-2">
+              <span class="text-textMuted">FATHER'S NAME:</span>
+              <span id="cv-father" class="text-white font-semibold text-right">Khalid Abbasi</span>
+            </div>
+            <div class="flex justify-between gap-2">
+              <span class="text-textMuted">AGE:</span>
+              <span id="cv-age" class="text-white text-right">24 Years</span>
+            </div>
+            <div class="flex justify-between gap-2">
+              <span class="text-textMuted">CNIC / ID NO:</span>
+              <span id="cv-cnic" class="text-cyanAI text-right">82203-XXXXXXX-X</span>
+            </div>
+            <div class="flex justify-between gap-2">
+              <span class="text-textMuted">PHONE / WHATSAPP:</span>
+              <span id="cv-phone" class="text-amberArch font-semibold text-right">+92 3XX XXXXXXX</span>
+            </div>
+            <div class="flex justify-between gap-2">
+              <span class="text-textMuted">EMAIL:</span>
+              <span id="cv-email" class="text-white text-right truncate">rubah.abbasi@portfolio.com</span>
+            </div>
+            <div class="flex justify-between gap-2">
+              <span class="text-textMuted">LOCATION:</span>
+              <span id="cv-location" class="text-white text-right">Pakistan</span>
+            </div>
+          </div>
+
+          <div class="border-t border-white/10 pt-4">
+            <span class="font-mono text-[10px] text-textMuted uppercase tracking-wider block mb-2.5">CORE TECHNOLOGIES &amp; AI TOOLS</span>
+            <div id="cv-skills-pills" class="flex flex-wrap gap-1.5"></div>
+          </div>
+        </div>
+
+        <!-- Right Column: Experience, Education & AI Workflow -->
+        <div class="lg:col-span-8 space-y-6">
+          <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-white/15 space-y-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-amberArch/15 border border-amberArch/40 flex items-center justify-center text-amberArch">
+                <i data-lucide="briefcase" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="font-mono text-[10px] text-amberArch uppercase tracking-widest">PROFESSIONAL TRACK RECORD (3.5+ YEARS)</span>
+                <h4 class="text-xl font-bold">Work Experience &amp; Technical Roles</h4>
+              </div>
+            </div>
+            <div id="cv-experience-list" class="space-y-6 border-l-2 border-white/10 pl-5 ml-2"></div>
+          </div>
+
+          <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-white/15 space-y-6">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyanAI/15 border border-cyanAI/40 flex items-center justify-center text-cyanAI">
+                <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="font-mono text-[10px] text-cyanAI uppercase tracking-widest">ACADEMIC QUALIFICATION &amp; SPECIALIZATION</span>
+                <h4 class="text-xl font-bold">University Education &amp; AI Mastery</h4>
+              </div>
+            </div>
+            <div id="cv-education-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+
+          <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-cyanAI/30 space-y-4">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyanAI/15 border border-cyanAI/40 flex items-center justify-center text-cyanAI">
+                <i data-lucide="cpu" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <span class="font-mono text-[10px] text-cyanAI uppercase tracking-widest">HYBRID CAPABILITY</span>
+                <h4 class="text-xl font-bold">AI-Augmented Architecture &amp; Full-Stack Web</h4>
+              </div>
+            </div>
+            <p class="text-textMuted text-xs sm:text-sm leading-relaxed">
+              Specialized in leveraging advanced Paid AI Platforms, Generative Architectural Design workflows, and Large Language Models to accelerate 3D visualization in <strong>Unreal Engine 5 &amp; Blender</strong> while building production-ready, interactive full-stack websites and digital twins.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 4: DUAL-DISCIPLINE SKILL MATRIX ================= -->
+    <section id="matrix" data-bg-index="2" class="py-16 px-4 sm:px-8 max-w-7xl mx-auto space-y-10">
+      <div class="text-center max-w-3xl mx-auto space-y-2">
+        <div class="font-mono text-xs text-cyanAI tracking-widest uppercase">// 04. CORE COMPETENCIES</div>
+        <h2 class="text-3xl sm:text-4xl font-bold tracking-tight">3D Unreal &amp; Blender <span class="text-amberArch">×</span> AI Web Engineering</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-amberArch/30 space-y-4">
+          <div class="flex items-center gap-3 mb-2">
+            <i data-lucide="box" class="w-6 h-6 text-amberArch"></i>
+            <h3 class="text-xl font-bold">3D Architecture &amp; Technical Infrastructure</h3>
+          </div>
+          <div class="space-y-3 font-mono text-xs">
+            <div>
+              <div class="flex justify-between mb-1"><span>Unreal Engine 5 (Real-Time ArchViz, Lumen &amp; Walkthroughs)</span><span class="text-amberArch">96%</span></div>
+              <div class="w-full h-1.5 bg-white/5 rounded-full"><div class="h-full bg-amberArch w-[96%] rounded-full"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>Blender 3D Modeling, Interior/Exterior Rendering &amp; Animation</span><span class="text-amberArch">95%</span></div>
+              <div class="w-full h-1.5 bg-white/5 rounded-full"><div class="h-full bg-amberArch w-[95%] rounded-full"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>FWO Technical Operations &amp; Optical Fiber Networks (3.5+ Yrs)</span><span class="text-amberArch">98%</span></div>
+              <div class="w-full h-1.5 bg-white/5 rounded-full"><div class="h-full bg-amberArch w-[98%] rounded-full"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 border border-cyanAI/30 space-y-4">
+          <div class="flex items-center gap-3 mb-2">
+            <i data-lucide="sparkles" class="w-6 h-6 text-cyanAI"></i>
+            <h3 class="text-xl font-bold">AI-Assisted Web Development &amp; Paid AI Tools</h3>
+          </div>
+          <div class="space-y-3 font-mono text-xs">
+            <div>
+              <div class="flex justify-between mb-1"><span>Full-Stack Website Development with Paid AI Toolchains</span><span class="text-cyanAI">97%</span></div>
+              <div class="w-full h-1.5 bg-white/5 rounded-full"><div class="h-full bg-cyanAI w-[97%] rounded-full"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>AI in Architectural Concept Generation &amp; 3D Asset Pipelines</span><span class="text-cyanAI">95%</span></div>
+              <div class="w-full h-1.5 bg-white/5 rounded-full"><div class="h-full bg-cyanAI w-[95%] rounded-full"></div></div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1"><span>BS Information Technology (Virtual University) &amp; Modern Web Stack</span><span class="text-cyanAI">94%</span></div>
+              <div class="w-full h-1.5 bg-white/5 rounded-full"><div class="h-full bg-cyanAI w-[94%] rounded-full"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SECTION 5: CLEAN CONTACT PORTAL ================= -->
+    <section id="contact" data-bg-index="3" class="py-24 px-4 sm:px-8 max-w-5xl mx-auto">
+      <div class="glass-panel rounded-3xl p-6 sm:p-10 border border-white/15 shadow-2xl">
+        <div class="border-b border-white/10 pb-6 mb-8">
+          <span class="font-mono text-xs text-cyanAI tracking-widest uppercase">// 05. DIRECT INQUIRY PORTAL</span>
+          <h2 class="text-3xl sm:text-4xl font-bold mt-1">Connect with Muhammad Rubah Abbasi</h2>
+          <p class="text-textMuted text-sm mt-1">
+            Available for 3D Architectural Visualization (Unreal Engine 5 / Blender), AI-Integrated Architectural Design, and Custom Full-Stack Websites.
+          </p>
+        </div>
+
+        <form id="contact-form" class="space-y-6">
+          <div>
+            <label class="block font-mono text-xs uppercase text-textMuted mb-3">SELECT PROJECT CATEGORY</label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <button type="button" class="collab-btn active p-4 rounded-2xl border border-amberArch bg-amberArch/15 text-left transition-all">
+                <i data-lucide="home" class="w-5 h-5 text-amberArch mb-1.5"></i>
+                <div class="font-bold text-sm">3D Arch Visualization</div>
+                <div class="font-mono text-[11px] text-textMuted">Unreal Engine 5 &amp; Blender Renders</div>
+              </button>
+              <button type="button" class="collab-btn p-4 rounded-2xl border border-white/10 bg-white/5 text-left transition-all">
+                <i data-lucide="cpu" class="w-5 h-5 text-cyanAI mb-1.5"></i>
+                <div class="font-bold text-sm">AI Architectural Design</div>
+                <div class="font-mono text-[11px] text-textMuted">Paid AI Workflows &amp; Concept Synthesis</div>
+              </button>
+              <button type="button" class="collab-btn p-4 rounded-2xl border border-white/10 bg-white/5 text-left transition-all">
+                <i data-lucide="globe" class="w-5 h-5 text-amberArch mb-1.5"></i>
+                <div class="font-bold text-sm">AI &amp; Full-Stack Website</div>
+                <div class="font-mono text-[11px] text-textMuted">Modern Interactive Web Development</div>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block font-mono text-xs text-textMuted mb-1">YOUR NAME</label>
+              <input type="text" required placeholder="Enter your full name" class="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/10 focus:border-cyanAI focus:outline-none text-sm" />
+            </div>
+            <div>
+              <label class="block font-mono text-xs text-textMuted mb-1">YOUR EMAIL</label>
+              <input type="email" required placeholder="name@company.com" class="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/10 focus:border-cyanAI focus:outline-none text-sm" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block font-mono text-xs text-textMuted mb-1">PROJECT BRIEF / MESSAGE</label>
+            <textarea rows="4" required placeholder="Write your message for Muhammad Rubah Abbasi..." class="w-full px-4 py-3 rounded-xl bg-black/60 border border-white/10 focus:border-cyanAI focus:outline-none text-sm"></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <span id="contact-feedback" class="font-mono text-xs text-emerald-400"></span>
+            <button type="submit" class="px-8 py-4 rounded-xl bg-gradient-to-r from-amberArch to-cyanAI text-black font-mono font-bold text-xs sm:text-sm uppercase tracking-wider hover:brightness-110 transition-all shadow-lg">
+              Send Inquiry
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="relative z-10 border-t border-white/10 py-10 px-4 sm:px-8 max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-xs text-textMuted">
+    <div id="footer-secret-trigger" class="cursor-pointer select-none">
+      © 2026 MUHAMMAD RUBAH KHALID ABBASI // ALL RIGHTS RESERVED
+    </div>
+    <div class="flex items-center gap-4">
+      <button type="button" id="footer-reset-data" class="dev-only hidden hover:text-amberArch underline">Reset Default Data</button>
+      <span class="text-cyanAI">PORTFOLIO STATUS: VERIFIED READ-ONLY</span>
+    </div>
+  </footer>
+
+  <!-- ================= SECRET OWNER PIN UNLOCK MODAL ================= -->
+  <div id="dev-pin-modal" class="fixed inset-0 z-[600] bg-black/85 backdrop-blur-xl hidden items-center justify-center p-4">
+    <div class="glass-panel border border-emerald-400/50 rounded-3xl max-w-md w-full p-6 sm:p-8 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>OWNER AUTHENTICATION // RUBAH ABBASI</span>
+        </div>
+        <button type="button" id="close-pin-modal" class="text-textMuted hover:text-white">✕</button>
+      </div>
+
+      <p class="text-xs text-textMuted leading-relaxed">
+        Restricted to <strong>Muhammad Rubah Abbasi</strong>. Enter your secret Owner PIN to upload Background 3D Videos, Project Videos/Pictures, and edit your CV.
+      </p>
+
+      <form id="dev-pin-form" class="space-y-4">
+        <div>
+          <label class="font-mono text-[11px] text-textMuted block mb-1">ENTER OWNER PIN (DEFAULT: 2026)</label>
+          <input
+            id="dev-pin-input"
+            type="password"
+            placeholder="••••"
+            class="w-full px-4 py-3 rounded-xl bg-black/70 border border-white/15 focus:border-emerald-400 focus:outline-none font-mono text-center text-lg tracking-[0.4em] text-white"
+          />
+          <p id="dev-pin-error" class="font-mono text-[11px] text-red-400 mt-1 hidden">Invalid PIN! Default PIN is 2026.</p>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-emerald-400 text-black font-mono font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all">
+          Unlock Owner Controls
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= SECRET BACKGROUND 3D VIDEOS MANAGER MODAL (OWNER ONLY) ================= -->
+  <div id="bg-manager-modal" class="fixed inset-0 z-[550] bg-black/85 backdrop-blur-xl hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="glass-panel border border-amberArch/50 rounded-3xl max-w-4xl w-full p-6 sm:p-8 space-y-6 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <div>
+          <span class="font-mono text-[10px] text-amberArch uppercase tracking-widest">// OWNER BACKGROUND ENGINE (INSTANT PREVIEW)</span>
+          <h3 class="text-xl sm:text-2xl font-bold text-white">Upload 3D Background Videos</h3>
+          <p class="text-xs text-textMuted mt-0.5">
+            Select your .mp4 videos from your computer below. Each video will immediately play in the preview box and in the website background (100% Muted).
+          </p>
+        </div>
+        <button type="button" id="close-bg-manager-btn" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">✕</button>
+      </div>
+
+      <div id="bg-video-slots-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-white/10 font-mono text-xs">
+        <span id="bg-save-status" class="text-emerald-400 font-bold"></span>
+        <button type="button" id="done-bg-manager-btn" class="px-6 py-2.5 rounded-xl bg-cyanAI text-black font-bold uppercase">
+          Apply &amp; Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= FULLSCREEN MEDIA LIGHTBOX MODAL ================= -->
+  <div id="lightbox-modal" class="fixed inset-0 z-[500] bg-black/90 backdrop-blur-xl hidden items-center justify-center p-4">
+    <button type="button" id="close-lightbox-btn" class="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white">
+      <i data-lucide="x" class="w-6 h-6"></i>
+    </button>
+    <div id="lightbox-content" class="max-w-6xl w-full max-h-[88vh] flex items-center justify-center"></div>
+  </div>
+
+  <!-- ================= "+ ADD PROJECT" STUDIO CMS DRAWER (OWNER ONLY) ================= -->
+  <div id="cms-drawer-backdrop" class="fixed inset-0 z-[350] bg-black/75 backdrop-blur-md hidden">
+    <aside class="fixed top-0 right-0 h-full w-full max-w-xl glass-panel border-l border-white/15 p-6 sm:p-8 overflow-y-auto flex flex-col justify-between shadow-2xl">
+      <div class="space-y-6">
+        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+          <div>
+            <span class="font-mono text-[10px] text-amberArch tracking-widest uppercase">// OWNER PROJECT UPLOADER</span>
+            <h3 class="text-xl font-bold">Upload New 3D / AI Web Project</h3>
+          </div>
+          <button type="button" id="close-cms-btn" class="w-9 h-9 rounded-full bg-white/5 hover:bg-white/15 flex items-center justify-center">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+
+        <form id="add-project-form" class="space-y-4 text-xs">
+          <div>
+            <label class="font-mono text-textMuted block mb-1">PROJECT TITLE *</label>
+            <input id="cms-title" type="text" required placeholder="e.g., Modern Villa Walkthrough (Unreal Engine 5)" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 focus:border-amberArch focus:outline-none text-sm" />
+          </div>
+
+          <div>
+            <label class="font-mono text-textMuted block mb-1">PROJECT DESCRIPTION *</label>
+            <textarea id="cms-subtitle" rows="2" required placeholder="Describe the Unreal Engine / Blender workflow or AI web integration..." class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 focus:border-amberArch focus:outline-none text-sm"></textarea>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="font-mono text-textMuted block mb-1">CATEGORY *</label>
+              <select id="cms-category" class="w-full px-3.5 py-2.5 rounded-xl bg-black/80 border border-white/10 focus:border-cyanAI focus:outline-none text-sm">
+                <option value="Blender & Unreal 3D">Blender &amp; Unreal 3D</option>
+                <option value="Interior & Exterior Arch">Interior &amp; Exterior Arch</option>
+                <option value="Full-Stack Websites">AI &amp; Full-Stack Websites</option>
+              </select>
+            </div>
+            <div>
+              <label class="font-mono text-textMuted block mb-1">ENGINE / TECH SPECS *</label>
+              <input id="cms-metric" type="text" required placeholder="e.g., Unreal Engine 5 + AI | 4K" class="w-full px-3.5 py-2.5 rounded-xl bg-black/60 border border-white/10 focus:border-cyanAI focus:outline-none text-sm" />
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+            <label class="font-mono text-amberArch block">1. SELECT PROJECT VIDEO (.MP4 — PLAYS FIRST FOR 5s)</label>
+            <label class="border border-dashed border-amberArch/50 hover:border-amberArch rounded-xl p-3 flex flex-col items-center justify-center text-center cursor-pointer bg-black/40 transition-all">
+              <i data-lucide="video" class="w-5 h-5 text-amberArch mb-1"></i>
+              <span id="cms-video-file-label" class="font-mono text-[11px] text-white">Click to Choose .MP4 Video File from PC</span>
+              <input type="file" id="cms-video-file" accept="video/*" class="hidden" />
+            </label>
+            <video id="cms-video-preview" muted loop playsinline class="hidden w-full h-32 object-cover rounded-xl border border-amberArch/40 mt-2"></video>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-white/5 border border-white/10 space-y-2">
+            <label class="font-mono text-cyanAI block">2. SELECT PROJECT PICTURES (MULTIPLE IMAGES)</label>
+            <label class="border border-dashed border-cyanAI/50 hover:border-cyanAI rounded-xl p-3 flex flex-col items-center justify-center text-center cursor-pointer bg-black/40 transition-all">
+              <i data-lucide="images" class="w-5 h-5 text-cyanAI mb-1"></i>
+              <span id="cms-images-file-label" class="font-mono text-[11px] text-white">Click to Select 1 or Multiple Pictures from PC</span>
+              <input type="file" id="cms-images-files" accept="image/*" multiple class="hidden" />
+            </label>
+            <div id="cms-images-preview-grid" class="grid grid-cols-4 gap-2 pt-1"></div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="font-mono text-textMuted block mb-1">SOFTWARE / AI TAGS</label>
+              <input id="cms-tags" type="text" value="Unreal Engine 5, Blender, Paid AI Tools, Full-Stack Web" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/10 text-sm" />
+            </div>
+            <div>
+              <label class="font-mono text-textMuted block mb-1">LIVE WEBSITE LINK (OPTIONAL)</label>
+              <input id="cms-demo" type="url" placeholder="https://..." class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/10 text-sm" />
+            </div>
+          </div>
+
+          <button type="submit" id="cms-submit-btn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amberArch to-cyanAI text-black font-mono font-bold text-xs uppercase tracking-wider shadow-lg hover:brightness-110 transition-all">
+            + Publish Project Now
+          </button>
+        </form>
+      </div>
+
+      <div class="font-mono text-[10px] text-textMuted border-t border-white/10 pt-4 mt-6">
+        ALL VIDEOS &amp; PICTURES ARE SAVED IN HIGH-CAPACITY INDEXED-DB VAULT.
+      </div>
+    </aside>
+  </div>
+
+  <!-- ================= LIVE CV EDITOR MODAL (OWNER ONLY) ================= -->
+  <div id="cv-editor-modal" class="fixed inset-0 z-[400] bg-black/85 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel border border-cyanAI/40 rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/10 pb-3">
+        <h3 class="text-lg font-bold text-cyanAI font-mono">// EDIT PERSONAL CV &amp; PHOTO</h3>
+        <button type="button" id="close-cv-editor-btn" class="text-textMuted hover:text-white">✕</button>
+      </div>
+      <form id="cv-editor-form" class="space-y-3 text-xs">
+        <div class="p-3 rounded-2xl bg-white/5 border border-amberArch/40 flex items-center justify-between gap-4">
+          <div class="font-mono">
+            <div class="text-amberArch font-bold">PROFILE PICTURE</div>
+            <div id="edit-cv-photo-status" class="text-[10px] text-textMuted">Upload your portrait photo</div>
+          </div>
+          <label class="px-3.5 py-2 rounded-xl bg-amberArch text-black font-mono font-bold text-xs cursor-pointer">
+            Choose Photo
+            <input type="file" id="modal-profile-photo-input" accept="image/*" class="hidden" />
+          </label>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-mono text-textMuted block mb-1">FULL NAME</label>
+            <input id="edit-cv-name" type="text" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-sm" />
+          </div>
+          <div>
+            <label class="font-mono text-textMuted block mb-1">FATHER'S NAME</label>
+            <input id="edit-cv-father" type="text" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-sm" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="font-mono text-textMuted block mb-1">AGE</label>
+            <input id="edit-cv-age" type="text" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-sm" />
+          </div>
+          <div>
+            <label class="font-mono text-cyanAI block mb-1">CNIC / ID CARD NO</label>
+            <input id="edit-cv-cnic" type="text" placeholder="e.g., 82203-1234567-1" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-cyanAI/40 text-sm text-white" />
+          </div>
+          <div>
+            <label class="font-mono text-amberArch block mb-1">PHONE / WHATSAPP</label>
+            <input id="edit-cv-phone" type="text" placeholder="e.g., +92 300 1234567" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-amberArch/40 text-sm text-white" />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="font-mono text-textMuted block mb-1">EMAIL ADDRESS</label>
+            <input id="edit-cv-email" type="text" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-sm" />
+          </div>
+          <div>
+            <label class="font-mono text-textMuted block mb-1">LOCATION</label>
+            <input id="edit-cv-location" type="text" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-sm" />
+          </div>
+        </div>
+
+        <div>
+          <label class="font-mono text-textMuted block mb-1">PROFESSIONAL HEADLINE / ROLE</label>
+          <input id="edit-cv-role" type="text" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-sm" />
+        </div>
+
+        <div>
+          <label class="font-mono text-textMuted block mb-1">EXECUTIVE BIO SUMMARY</label>
+          <textarea id="edit-cv-bio" rows="3" class="w-full px-3.5 py-2 rounded-xl bg-black/60 border border-white/15 text-sm"></textarea>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-cyanAI text-black font-mono font-bold uppercase tracking-wider">
+          Save Personal CV Settings
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= INTERACTIVE AI ASSISTANT (CMD/CTRL + K) ================= -->
+  <div id="ai-palette-backdrop" class="fixed inset-0 z-[450] bg-black/75 backdrop-blur-md hidden items-center justify-center p-4">
+    <div class="glass-panel border border-cyanAI/40 rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl">
+      <div class="px-5 py-3.5 bg-black/60 border-b border-white/10 flex items-center justify-between font-mono text-xs">
+        <div class="flex items-center gap-2 text-cyanAI">
+          <span class="w-2 h-2 rounded-full bg-cyanAI animate-ping"></span>
+          <span>RUBAH_ABBASI_AI // PORTFOLIO TERMINAL</span>
+        </div>
+        <button type="button" id="close-ai-btn" class="text-textMuted hover:text-white">ESC</button>
+      </div>
+
+      <div id="ai-chat-log" class="p-5 h-60 overflow-y-auto space-y-3 font-mono text-xs">
+        <div class="p-3 rounded-xl bg-cyanAI/10 border border-cyanAI/30 text-cyanAI">
+          <strong>[SYSTEM]:</strong> Welcome to Muhammad Rubah Abbasi's Interactive Portfolio. Explore his Unreal Engine 5 &amp; Blender 3D projects, FWO &amp; Optical Fiber experience, or AI Web stack below:
+        </div>
+      </div>
+
+      <div class="px-5 py-3 bg-black/40 border-t border-white/10 flex flex-wrap gap-2">
+        <button type="button" data-ai-cmd="Show Unreal & Blender 3D Projects" class="ai-chip px-3 py-1.5 rounded-lg bg-white/5 hover:bg-amberArch/20 border border-white/10 font-mono text-[11px] text-amberArch">
+          "Show Unreal &amp; Blender 3D Projects"
+        </button>
+        <button type="button" data-ai-cmd="View Muhammad Rubah Abbasi CV" class="ai-chip px-3 py-1.5 rounded-lg bg-white/5 hover:bg-cyanAI/20 border border-white/10 font-mono text-[11px] text-cyanAI">
+          "View Muhammad Rubah Abbasi CV"
+        </button>
+        <button type="button" data-ai-cmd="Switch to Blueprint Mode" class="ai-chip px-3 py-1.5 rounded-lg bg-white/5 hover:bg-cyanAI/20 border border-white/10 font-mono text-[11px] text-cyanAI">
+          "Switch to Blueprint Mode"
+        </button>
+      </div>
+
+      <form id="ai-chat-form" class="p-3 bg-black/80 border-t border-white/10 flex items-center gap-2">
+        <i data-lucide="chevron-right" class="w-4 h-4 text-cyanAI ml-2"></i>
+        <input id="ai-chat-input" type="text" placeholder="Ask about Rubah Abbasi's skills or type '2026' to unlock owner tools..." class="w-full bg-transparent focus:outline-none font-mono text-xs text-white" />
+        <button type="submit" class="px-4 py-2 rounded-lg bg-cyanAI text-black font-mono font-bold text-xs">SEND</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="projectsData.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
